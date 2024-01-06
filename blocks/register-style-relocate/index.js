@@ -38,6 +38,9 @@ const {
 
 const { withDispatch } = wp.data;
 
+import { PreviewPanel } from './preview-panel.js'
+import { getActiveStyle, getDefaultStyle, replaceActiveStyle  } from './utils.js'
+
 // Define the RegisteredStyles component
 const RegisteredStyles = ({ styles, ...props }) => {
     const { attributes, setAttributes, createNotice } = props;
@@ -46,73 +49,16 @@ const RegisteredStyles = ({ styles, ...props }) => {
     const [currentStyle, setCurrentStyle] = useState(false);
     const [hoveredStyle, setHoveredStyle] = useState(false);
 
-    // Run the effect only once after the component is mounted
-    useEffect(() => {
-        const reqSylWrap = document.querySelector('.block-editor-block-inspector .block-editor-block-styles');
-        hideRegisteredStylesWrap(reqSylWrap);
-    }, []);
-
-    // Handle the style selection event
-    const onStyleSelect = (newStyle) => {
-        let figure = document.querySelector('[data-type="mie/image"] > *');
-        let classTokens = figure.classList;
-        let activeStyle = getActiveStyle(styles, classTokens);
-
-        if (figure) {
-            replaceActiveStyle(classTokens, activeStyle, newStyle);
-            setAttributes({
-                className: 'is-style-' + newStyle.name
-            });
-        }
-        setCurrentStyle(activeStyle);
-        createNotice({ content: `Style selected!: aaa`, type: 'success' });
-    };
-
-    // Handle the style preview selection event
-    const onSelectStylePreview = (style) => {
-        onStyleSelect(style);
-    };
-
-    const styleItemHandler = (item) => {
-        console.log('styleItemHandler', item);
-        setHoveredStyle(item)
-        setShowPreview(item)
-    };
-
-
-    function getActiveStyle(styles, tokenList) {
-        for (const style of tokenList) {
-            if (style.indexOf('is-style-') === -1) {
-                continue;
-            }
-
-            const potentialStyleName = style.substring(9);
-            const activeStyle = styles?.find(
-                ({ name }) => name === potentialStyleName
-            );
-
-            if (activeStyle) {
-                return activeStyle;
-            }
+    // Create style buttons
+    const styleButtons = (styles) => {
+        if (!Array.isArray(styles)) {
+            return null;
         }
 
-        return getDefaultStyle(styles);
-    }
-
-    // Retrieve the default style
-    function getDefaultStyle(styles) {
-        return styles?.find((style) => style.isDefault);
-    }
-
-    // Replace the active style with the new style
-    function replaceActiveStyle(list, activeStyle, newStyle) {
-        if (activeStyle) {
-            list.remove('is-style-' + activeStyle.name);
-        }
-
-        list.add('is-style-' + newStyle.name);
-        return list.value;
-    }
+        return styles.map((style) => {
+            return createButton(style, "block-editor-block-styles__ite");
+        });
+    };
 
     // Create a button element
     const createButton = (style, className, variant = "secondary") => {
@@ -131,60 +77,49 @@ const RegisteredStyles = ({ styles, ...props }) => {
         );
     };
 
-    // Create style buttons
-    const styleButtons = (styles) => {
-        if (!Array.isArray(styles)) {
-            return null;
-        }
-
-        return styles.map((style) => {
-            return createButton(style, "block-editor-block-styles__ite");
-        });
-    };
-
     const previewModal = () => {
         let styleToShow;
 
-        if (!hoveredStyle){
+        if (!hoveredStyle)
             styleToShow = currentStyle.name
-        } else {
+        else
             styleToShow = hoveredStyle.name
+
+        return showPreview
+            && PreviewPanel(styleToShow);
+    };
+
+    useEffect(() => {
+        const reqSylWrap = document.querySelector('.block-editor-block-inspector .block-editor-block-styles');
+        hideRegisteredStylesWrap(reqSylWrap);
+    }, []);
+
+    
+    // Handle the style preview selection event
+    const onSelectStylePreview = (style) => {
+        onStyleSelect(style);
+    };
+    
+    // Handle the style selection event
+    const onStyleSelect = (newStyle) => {
+        let figure = document.querySelector('[data-type="mie/image"] > *');
+        let classTokens = figure.classList;
+        let activeStyle = getActiveStyle(styles, classTokens);
+
+        if (figure) {
+            replaceActiveStyle(classTokens, activeStyle, newStyle);
+            setAttributes({
+                className: 'is-style-' + newStyle.name
+            });
         }
+        setCurrentStyle(activeStyle);
+        createNotice({ content: `Style selected!: aaa`, type: 'success' });
+    };
 
-        return showPreview && el(
-            Popover,
-            {
-                placement: "left-start",
-                offset: 34,
-                focusOnMount: false,
-                onClose: () => styleItemHandler(null)
-            },
-            el(
-                "div",
-                {
-                    className: "block-editor-block-styles__preview-panel",
-                    onMouseLeave:  () => styleItemHandler(null)
-                },
-                el(
-                    'div', 
-                    {
-                        activeStyle: "activeStyle",
-                        className: `preview__element is-style-${styleToShow}`
-
-                    }, 
-                ),
-                el(
-                    'div',
-                    {
-                        activeStyle: "activeStyle",
-                        className: "preview__info"
-
-                    },
-                    `${styleToShow}`
-                )
-            )
-    )};
-
+    const styleItemHandler = (item) => {
+        setHoveredStyle(item)
+        setShowPreview(item)
+    };
 
     return el('div', null, [
         styleButtons(styles),
