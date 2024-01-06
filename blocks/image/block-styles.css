@@ -2,3 +2,24 @@
 .is-style-mietest1 {
     border: 2px solid purple;
 }
+
+.preview__element {
+    display: block;
+    width: 240px;
+    height: 140px;
+    background-image: url('https://tse4.mm.bing.net/th?id=OIP.f6faGWIp8JlUX1mGQ4_XjQAAAA&pid=Api');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.preview__info {
+    display: flex;
+    padding: 10px;
+}
+
+.preview__element,
+.preview__info {
+    background-color: aliceblue;
+    color: black;
+}
