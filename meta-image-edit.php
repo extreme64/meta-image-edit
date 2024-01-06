@@ -11,29 +11,12 @@
 
 // Register the block
 function mie_register_block() {
-    // Register block script
-    wp_register_script(
-        'mie-block-editor-script',
-        plugin_dir_url(__FILE__) . 'blocks/image/index.js',
-        array('wp-blocks', 'wp-element', 'wp-editor'),
-        filemtime(plugin_dir_path(__FILE__) . 'blocks/image/index.js'),
-        true
-    );    
 
-    // "editorScript": "file:./index.js",
-    // "script": "file:./script.js",
-    // "viewScript": [ "file:./view.js", "example-shared-view-script" ],
-    // "editorStyle": "file:./index.css",
-    // "style": [ "file:./style.css", "example-shared-style" ]
-
-    // Register the block
     register_block_type('mie/image', array(
         'editor_script' => 'mie-block-editor-script',
         'editor_style'  => 'mie-block-editor-style', 
+        'script'        => 'mie-block-script',
         'style'         => 'mie-block-styles',
-        
-        "script"=> "./scriptSSS.js",
-        "style"=> "example-shared-view-script",
 
         'render_callback' => 'mie_render_block',
         'attributes' => array(
@@ -61,12 +44,31 @@ function mie_register_block() {
     ));
 
     
-    register_block_style('mie/image', [
-        'name' => 'mietest1', 'label' => _x( 'MIE Test 1', 'mie-block' )
-	]);
+    // Register block styles
+    register_block_style('mie/image', array(
+        'name' => 'mietest1',
+        'label' => _x('MIE Test 1', 'mie-block'),
+    ));
 
+    // Register block script
+    wp_register_script(
+        'mie-block-editor-script',
+        plugin_dir_url(__FILE__) . 'blocks/image/index.js',
+        array('wp-blocks', 'wp-element', 'wp-editor'),
+        filemtime(plugin_dir_path(__FILE__) . 'blocks/image/index.js'),
+        true
+    ); 
+
+    if (!is_admin()) {
+        wp_register_script(
+            'mie-block-script',
+            plugin_dir_url(__FILE__) . 'blocks/image/index-front.js',
+            array(),
+            filemtime(plugin_dir_path(__FILE__) . 'blocks/image/index-front.js'),
+            true
+        ); 
+    }
 }
-// Hook into the block registration action
 add_action('init', 'mie_register_block');
 
 function enqueue_block_styles() {
@@ -78,9 +80,6 @@ function enqueue_block_styles() {
         '1.0',
         'all'
     );
-}
-add_action('enqueue_block_assets', 'enqueue_block_styles');
-function enqueue_frontend_styles() {
     // Enqueue block styles for the frontend
     wp_enqueue_style(
         'mie-block-styles',
@@ -90,7 +89,8 @@ function enqueue_frontend_styles() {
         'all'
     );
 }
-add_action('wp_enqueue_scripts', 'enqueue_frontend_styles');
+add_action('enqueue_block_assets', 'enqueue_block_styles');
+
 
 // Enqueue the block assets
 function mie_enqueue_block_assets() {
