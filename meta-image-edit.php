@@ -146,6 +146,8 @@ function mie_render_block($attributes) {
     $license_name = get_the_title( $license );
     $license_url = get_post_permalink( $license );
     $source = isset( $mie_media_data['mie_source'] ) ? $mie_media_data['mie_source'] : '';
+    $mediaDimensions = $attributes['mediaDimensions'];
+    $imgStyle = 'width: ' . $attributes['mediaDimensions']['width'] . 'px; height: ' . $attributes['mediaDimensions']['height'] . 'px';
 
     if (!empty($mediaID)) {
         $attachment = get_post($mediaID);
@@ -160,9 +162,15 @@ function mie_render_block($attributes) {
     ?>
     
 
-    <div class="mie-image-block <?php echo $attributes['className'] ?>" <?php echo get_block_wrapper_attributes(); ?> style="font-size: 13px">
+    <div class="mie-image-block <?php echo $attributes['className'] ?>" <?php echo get_block_wrapper_attributes(); ?> 
+        style="font-size: 13px; width: <?= $attributes["mediaFlexWidth"] ?>%">
+        
         <?php if (!empty($mediaID)) : ?>
-            <img src="<?php echo wp_get_attachment_image_src($mediaID, 'full')[0]; ?>" alt="<?php echo $altText ?> title="<?php echo $caption ?>">
+            <img 
+                src="<?php echo wp_get_attachment_image_src($mediaID, 'full')[0]; ?>" 
+                alt="<?php echo $altText ?>" 
+                title="<?php echo $caption ?>"
+                style="<?= $imgStyle ?>" >
         <?php endif; ?>    
         <p style="padding: 0; margin: 8px 0"><?php echo esc_html($description); ?></p>
         <p style="padding: 0; margin: 8px 0">
