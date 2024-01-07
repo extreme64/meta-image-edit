@@ -15,7 +15,7 @@ const {
     Icon: IconComp 
 } = wp.components;
 
-const { createElement: el, useMemo } = wp.element;
+const { createElement: el, useMemo, useState } = wp.element;
 const { useSelect } = wp.data
 
 
@@ -82,6 +82,8 @@ const inspector = (props, onSelect, styles ) => {
 
     const { attributes, setAttributes, clientId } = props;
 
+    const [mediaWrapWidth, setMediaWrapWidth] = useState(attributes.mediaFlexWidth); // Example initial value
+
 
     function MediaSizeSelect({ value }) {
 
@@ -130,6 +132,17 @@ const inspector = (props, onSelect, styles ) => {
             }
         );
     }
+
+    const handleButtonClick = (value) => {
+        setMediaWrapWidth(value);
+        setAttributes({
+            mediaFlexWidth: value
+        })
+
+        let blockWrap = document.querySelector('[data-type="mie/image"]');
+        blockWrap.style.width = `${value}%`;
+    };
+
 
     return el(InspectorControls,
         {},
@@ -191,7 +204,19 @@ const inspector = (props, onSelect, styles ) => {
                             name: "width",
                             className: "mie__image-dimensions__width",
                             label: 'Width',
-                            value: 130
+                            value: attributes.mediaDimensions.width,
+                            onChange: (newWidthNumber) => {
+                                setAttributes({
+                                    mediaDimensions: {
+                                        width: newWidthNumber,
+                                        height: attributes.mediaDimensions.height
+                                    }
+                                })
+
+                                let media = document.querySelector('[data-type="mie/image"] .mie-image__media');
+                                media.style.width = `${attributes.mediaDimensions.width}px`;
+                                media.style.height = `${attributes.mediaDimensions.height}px`;
+                            }
                         }
                         ),
 
@@ -199,48 +224,65 @@ const inspector = (props, onSelect, styles ) => {
                             name: "height",
                             className: "mie__image-dimensions__height",
                             label: 'Height',
-                            value: 100
+                            value: attributes.mediaDimensions.height,
+                            onChange: (newHeightNumber) => {
+                                setAttributes({
+                                    mediaDimensions: {
+                                        width: attributes.mediaDimensions.width,
+                                        height: newHeightNumber
+                                    }
+                                })
+
+                                let media = document.querySelector('[data-type="mie/image"] .mie-image__media');
+                                media.style.width = `${attributes.mediaDimensions.width}px`;
+                                media.style.height = `${attributes.mediaDimensions.height}px`;
+                            }
                         }
                         )
                     )
                 ),
+                // Rendered component
                 el(BaseControl, {
                         className: "mie__row--no-bottom-margin"
                     },
-                    el(ButtonGroup, {
-                        role: 'group'
-                    },
-                        el(Button, {
-                            "aria-pressed": "false",
-                            className: "is-small"
-                        },
-                            "25%"
+                        el(ButtonGroup, {
+                                role: 'group'
+                            },
+                            el(Button, {
+                                "aria-pressed": mediaWrapWidth === "25", // Check if this button should be pressed
+                                className: "is-small " + ((mediaWrapWidth === "25") ? "is-pressed" : ''),
+                                onClick: () => handleButtonClick("25") // Pass the value to set
+                            },
+                                "25%"
+                            ),
+                            el(Button, {
+                                "aria-pressed": mediaWrapWidth === "50",
+                                className: "is-small " + ((mediaWrapWidth === "50") ? "is-pressed" : ''),
+                                onClick: () => handleButtonClick("50")
+                            },
+                                "50%"
+                            ),
+                            el(Button, {
+                                "aria-pressed": mediaWrapWidth === "75",
+                                className: "is-small " + ((mediaWrapWidth === "75") ? "is-pressed" : ''),
+                                onClick: () => handleButtonClick("75")
+                            },
+                                "75%"
+                            ),
+                            el(Button, {
+                                "aria-pressed": mediaWrapWidth === "100",
+                                className: "is-small " + ((mediaWrapWidth === "100") ? "is-pressed" : ''),
+                                onClick: () => handleButtonClick("100")
+                            },
+                                "100%"
+                            )
                         ),
                         el(Button, {
-                            "aria-pressed": "false",
-                            className: "is-small"
-                        },
-                            "50%"
-                        ),
-                        el(Button, {
-                            "aria-pressed": "false",
-                            className: "is-small"
-                        },
-                            "75%"
-                        ),
-                        el(Button, {
-                            "aria-pressed": "true",
-                            className: "is-small is-pressed"
-                        },
-                            "100%"
+                                className: "is-small"
+                            },
+                            "Reset"
                         )
-                    ),
-                    el(Button, {
-                        className: "is-small"
-                    },
-                        "Reset"
                     )
-                )
             ),
             tab.name === 'tab2' && el(PanelBody, {
                     title: "Styles",

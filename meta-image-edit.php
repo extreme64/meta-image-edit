@@ -32,6 +32,14 @@ function mie_register_block() {
                 'type' => 'string',
                 'default' => '100%',
             ),
+            'mediaDimensions' => array(
+                'type' => 'object',
+                'default' => json_encode(['width' => '300px', 'height' => '200px'])
+            ),
+            'mediaFlexWidth' => array(
+                'type' => 'string',
+                'default' => '50'
+            ),
             'alt' => array(
                 'type' => 'string',
                 'default' => 'illustration',
@@ -152,7 +160,7 @@ function mie_render_block($attributes) {
     ?>
     
 
-    <div class="mie-image-block <?php echo $attributes['className'] ?>" style="font-size: 13px">
+    <div class="mie-image-block <?php echo $attributes['className'] ?>" <?php echo get_block_wrapper_attributes(); ?> style="font-size: 13px">
         <?php if (!empty($mediaID)) : ?>
             <img src="<?php echo wp_get_attachment_image_src($mediaID, 'full')[0]; ?>" alt="<?php echo $altText ?> title="<?php echo $caption ?>">
         <?php endif; ?>    

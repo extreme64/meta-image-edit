@@ -20,6 +20,14 @@ export const editBlock = (props, styles) => {
 
     useEffect(() => {
 
+        console.log(attributes);
+
+        let blockWrap = document.querySelector('[data-type="mie/image"]');
+        blockWrap.style.width = `${attributes.mediaFlexWidth}%`;
+
+        let media = blockWrap.querySelector('.mie-image__media');
+        media.style.width = `${attributes.mediaDimensions.width}px`;
+        media.style.height = `${attributes.mediaDimensions.height}px`;
     }, [])
 
     useEffect(() => {
@@ -66,8 +74,6 @@ export const editBlock = (props, styles) => {
         const reqSylWrap = document.querySelector('.block-editor-block-inspector .block-editor-block-styles')
         if (reqSylWrap) {
             hideRegisteredStylesWrap(reqSylWrap);
-        } else {
-            console.error("No 'regestered styles' panel, to hide!");
         }
     };
 
@@ -78,6 +84,7 @@ export const editBlock = (props, styles) => {
         }
     },
     [selectedTab]);
+
 
 
     const replaceImage = () => {
@@ -179,9 +186,10 @@ export const editBlock = (props, styles) => {
                     'Select Image'
                 )
                 : el('img', {
-                    src: attributes.mediaURL,
-                    alt: 'Custom Image'
-                }
+                        src: attributes.mediaURL,
+                        alt: 'Custom Image',
+                        class: 'mie-image__media',
+                    }
                 )
         }
     });
@@ -189,7 +197,7 @@ export const editBlock = (props, styles) => {
 
     return el('figure',
         {
-            className: attributes.className
+            className: attributes.className,
         },
         inspector(props, onSelect, styles), advancedInspector,
         controls, pickMedia,
