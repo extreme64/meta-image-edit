@@ -9,7 +9,6 @@ const {
 // Define the RegisteredStyles component
 export const PreviewPanel = (style) => {
 
-    console.log(style);
     return el(
         Popover,
         {
@@ -19,7 +18,7 @@ export const PreviewPanel = (style) => {
             onClose: () => styleItemHandler(null)
         },
         el(
-            "div",
+            "div", 
             {
                 className: "block-editor-block-styles__preview-panel",
                 onMouseLeave: () => styleItemHandler(null)

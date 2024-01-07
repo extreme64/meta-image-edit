@@ -19,6 +19,7 @@ export const editBlock = (props, styles) => {
     const [ selectedTab, setSelectedTab ] = useState('tab1')
 
     useEffect(() => {
+
     }, [])
 
     useEffect(() => {
@@ -90,12 +91,6 @@ export const editBlock = (props, styles) => {
             mediaID: media.id,
         });
     };
-
-    // Handler for updating the alt attribute
-    const onChangeAlt = (newAlt) => {
-        setAttributes({ alt: newAlt });
-    };
-
 
     // FIXME: deprecated.min.js?ver=6c963cb9494ba26b77eb:2 Using Toolbar without label prop is deprecated since version 5.6. Please use ToolbarGroup component instead. See: https://developer.wordpress.org/block-editor/components/toolbar/
     /**
@@ -196,7 +191,7 @@ export const editBlock = (props, styles) => {
         {
             className: attributes.className
         },
-        inspector(props, attributes, onSelect, onChangeAlt, styles), advancedInspector,
+        inspector(props, onSelect, styles), advancedInspector,
         controls, pickMedia,
         el(RichText, {
             tagName: 'p',

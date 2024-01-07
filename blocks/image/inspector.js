@@ -15,8 +15,12 @@ const {
     Icon: IconComp 
 } = wp.components;
 
-const { createElement: el, useEffect } = wp.element;
+const { createElement: el, useMemo } = wp.element;
+const { useSelect } = wp.data
+
+
 import { RegisteredStyles, EnhancedRegisteredStyles } from './../register-style-relocate/index.js';
+
 
 /**
      * Inspector Tabs array
@@ -71,8 +75,61 @@ const inspectorTabs = [
  *
  * @var ReactNode
  */
-const inspector = (props, attributes, onSelect, onChangeAlt, styles ) => {
+const inspector = (props, onSelect, styles ) => {
    
+
+    //FIXME: get styles select('core/block-editor').getBlockStyles('core/paragraph');
+
+    const { attributes, setAttributes, clientId } = props;
+
+
+    function MediaSizeSelect({ value }) {
+
+        let mediaSizes
+        let options = [{
+            label: 'Pick',
+            value: -1,
+        }];
+
+        mediaSizes = useSelect((select) => {
+            return select('core').getMedia(attributes.mediaID);
+        }, []);
+         
+        options = useMemo(() => {
+            let sizes = mediaSizes?.media_details.sizes;
+            let sizesMissing = mediaSizes?.missing_image_sizes;
+            if (mediaSizes && sizes) {
+                return [
+                    {
+                        label: 'Default',
+                        value: -1,
+                    },
+                    ...Object.keys(sizes).map((value, index) => ({
+                        label: sizes[index],
+                        value: value,
+                    })),
+                    ...Object.keys(sizesMissing).map((value, index) => ({
+                        label: sizesMissing[index],
+                        value: value,
+                        disabled: true,
+                    })),
+                ];
+            }
+            return [];
+        }, [mediaSizes]);
+
+        
+        return el(
+            SelectControl, {
+                label: "IMAGE SIZE",
+                value: value,
+                options: options,
+                onChange: (newPick) => {
+                    return setAttributes({ mediaSize: newPick });
+                }
+            }
+        );
+    }
 
     return el(InspectorControls,
         {},
@@ -106,19 +163,19 @@ const inspector = (props, attributes, onSelect, onChangeAlt, styles ) => {
                     el(TextareaControl, {
                         label: "ALT TEXT (ALTERNATIVE TEXT)",
                         value: attributes.alt,
-                        onChange: onChangeAlt
+                        onChange: (value) => {
+                            return setAttributes({ alt: value });
+                        }
                     })
                 ),
                 el(BaseControl,
                     {},
-                    el(SelectControl, {
+                    el(MediaSizeSelect, {
                         label: "IMAGE SIZE",
-                        value: null,
-                        options: [
-                            { label: 'Thumbnail', value: '25%' },
-                            { label: 'Medium', value: '50%' },
-                            { label: 'Full Size', value: '100%' },
-                        ]
+                        value: attributes.mediaSize, 
+                        onChange: (value) => {
+                            return setAttributes({ mediaSize: value });
+                        } 
                     }),
                     el("p", {},
                         "Image dimensions"
@@ -148,8 +205,8 @@ const inspector = (props, attributes, onSelect, onChangeAlt, styles ) => {
                     )
                 ),
                 el(BaseControl, {
-                    className: "mie__row--no-bottom-margin"
-                },
+                        className: "mie__row--no-bottom-margin"
+                    },
                     el(ButtonGroup, {
                         role: 'group'
                     },

@@ -28,6 +28,14 @@ function mie_register_block() {
                 'type' => 'string',
                 'default' => '',
             ),
+            'mediaSize' => array(
+                'type' => 'string',
+                'default' => '100%',
+            ),
+            'alt' => array(
+                'type' => 'string',
+                'default' => 'illustration',
+            ),
             'author' => array(
                 'type' => 'string',
                 'default' => '',
