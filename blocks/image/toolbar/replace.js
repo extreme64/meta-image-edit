@@ -73,7 +73,7 @@ const ReplacePanel = ({ ...props }, dispatch) => {
                 }
             })
         )
-    );
-}
+    )
+};
 
 export { ReplacePanel }

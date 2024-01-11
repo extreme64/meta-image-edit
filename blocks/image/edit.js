@@ -7,17 +7,15 @@ const {
 } = wp.components;
 
 const { useEffect, useState, useReducer, createElement: el } = wp.element;
-const { useDispatch, subscribe, select, useSelect } = wp.data;
-const { dispatch } = wp.data;
-
+const { dispatch, useDispatch, subscribe, select, useSelect } = wp.data;
 
 import { inspector, advancedInspector } from './inspector.js'
 import { hideRegisteredStylesWrap } from './../register-style-relocate/index.js';
 import { ReplacePanel } from  './toolbar/replace.js'
+import { DuotonePanel } from './toolbar/duotone.js';
 
 
 const initialState = { isModalOpen: false };
-
 const modalReducer = (state, action) => {
     switch (action.type) {
         case 'OPEN_MODAL':
@@ -36,7 +34,9 @@ export const editBlock = (props, styles) => {
     const [ selectedTab, setSelectedTab ] = useState('tab1');
     const [ replacePopoverShow, setReplacePopoverShow ] = useState(false);
     const [state, dispatchModal ] = useReducer(modalReducer, initialState);
+    const [ duotoneColor, setDuotoneColor] = useState('#222222');
 
+    
     useEffect(() => {
         setReplacePopoverShow(state.isModalOpen);
     }, [state])
@@ -48,7 +48,6 @@ export const editBlock = (props, styles) => {
     }, [isSelected])
 
     useEffect(() => {
-
         let blockWrap = document.querySelector('[data-type="mie/image"]');
         blockWrap.style.width = `${attributes.mediaFlexWidth}%`;
 
@@ -108,6 +107,10 @@ export const editBlock = (props, styles) => {
     },
     [selectedTab]);
 
+    useEffect(() => {
+        console.log("duo", duotoneColor);
+    }, [duotoneColor])
+
 
     const toolbarActionHandle = (action) => {
         switch (action) {
@@ -137,7 +140,9 @@ export const editBlock = (props, styles) => {
         BlockControls,
         null,
         el(Toolbar,
-            null,           
+            {
+                className: "mie-image-toolbar"
+            },           
             el(ToolbarGroup,
                 null,
                 el("button",
@@ -169,7 +174,8 @@ export const editBlock = (props, styles) => {
                             d: "M12 4 4 19h16L12 4zm0 3.2 5.5 10.3H12V7.2z"
                         })
                     )
-                )
+                ),
+                DuotonePanel(props)
             ),
             el(ToolbarGroup,
                 null,

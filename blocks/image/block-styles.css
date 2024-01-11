@@ -36,4 +36,13 @@
     border-bottom: 1px solid black;
     border-left: 0px;
     border-right: 0px;
-}*/
+}
+
+.duotone-popover button .components-h-stack {
+    flex-direction: row;
+}
+
+.duotone-popover .components-circular-option-picker__custom-clear-wrapper {
+    display: flex;
+    justify-content: flex-end;
+}
