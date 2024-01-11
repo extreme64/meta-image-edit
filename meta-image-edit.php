@@ -147,7 +147,9 @@ function mie_render_block($attributes) {
     $license_url = get_post_permalink( $license );
     $source = isset( $mie_media_data['mie_source'] ) ? $mie_media_data['mie_source'] : '';
     $mediaDimensions = $attributes['mediaDimensions'];
-    $imgStyle = 'width: ' . $attributes['mediaDimensions']['width'] . 'px; height: ' . $attributes['mediaDimensions']['height'] . 'px';
+    if(is_array($attributes['mediaDimensions'])){
+        $imgStyle = 'width: ' . $attributes['mediaDimensions']['width'] . 'px; height: ' . $attributes['mediaDimensions']['height'] . 'px';
+    }
 
     if (!empty($mediaID)) {
         $attachment = get_post($mediaID);
