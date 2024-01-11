@@ -6,21 +6,48 @@ const {
     Dashicon,
 } = wp.components;
 
-const { useEffect, useState, createElement: el } = wp.element;
-const { useDispatch, select, useSelect } = wp.data;
+const { useEffect, useState, useReducer, createElement: el } = wp.element;
+const { useDispatch, subscribe, select, useSelect } = wp.data;
+const { dispatch } = wp.data;
 
 
 import { inspector, advancedInspector } from './inspector.js'
 import { hideRegisteredStylesWrap } from './../register-style-relocate/index.js';
+import { ReplacePanel } from  './toolbar/replace.js'
+
+
+const initialState = { isModalOpen: false };
+
+const modalReducer = (state, action) => {
+    switch (action.type) {
+        case 'OPEN_MODAL':
+            return { ...state, isModalOpen: true };
+        case 'CLOSE_MODAL':
+            console.log('CLOSE_MODAL');
+            return { ...state, isModalOpen: false };
+        default:
+            return state;
+    }
+};
 
 export const editBlock = (props, styles) => { 
     
-    const { attributes, setAttributes, clientId } = props;
-    const [ selectedTab, setSelectedTab ] = useState('tab1')
+    const { attributes, setAttributes, clientId, isSelected } = props;
+    const [ selectedTab, setSelectedTab ] = useState('tab1');
+    const [ replacePopoverShow, setReplacePopoverShow ] = useState(false);
+    const [state, dispatchModal ] = useReducer(modalReducer, initialState);
 
     useEffect(() => {
+        setReplacePopoverShow(state.isModalOpen);
+    }, [state])
 
-        console.log(attributes);
+    useEffect(() => {
+        if(!isSelected) {
+            toolbarActionHandle(null);
+        }
+    }, [isSelected])
+
+    useEffect(() => {
 
         let blockWrap = document.querySelector('[data-type="mie/image"]');
         blockWrap.style.width = `${attributes.mediaFlexWidth}%`;
@@ -68,28 +95,29 @@ export const editBlock = (props, styles) => {
     }, [attributes.mediaID]);
 
     const onSelect = (tabName) => {
-
         setSelectedTab(tabName)
-
-        const reqSylWrap = document.querySelector('.block-editor-block-inspector .block-editor-block-styles')
-        if (reqSylWrap) {
-            hideRegisteredStylesWrap(reqSylWrap);
+        const reqStyleWrap = document.querySelector('.block-editor-block-inspector .block-editor-block-styles')
+        if (reqStyleWrap) {
+            hideRegisteredStylesWrap(reqStyleWrap);
         }
     };
 
     useEffect(() => {
-
         if (selectedTab == 'tab2') {
-           
         }
     },
     [selectedTab]);
 
 
-
-    const replaceImage = () => {
-        // Replace image logic goes here
-        console.log('Replace image clicked!');
+    const toolbarActionHandle = (action) => {
+        switch (action) {
+            case 'replaceimage':
+                setReplacePopoverShow(true);
+                break;
+            default:
+                setReplacePopoverShow(false);
+                break;
+        }
     };
 
     const onSelectMedia = (media) => {
@@ -109,46 +137,23 @@ export const editBlock = (props, styles) => {
         BlockControls,
         null,
         el(Toolbar,
-            null,
+            null,           
             el(ToolbarGroup,
                 null,
                 el("button",
                     {
-                        onClick: replaceImage,
-                        className: 'mei-no-sborder'
-                    },
-                    "Replace"
-                ),
-                el("button",
-                    {
-                        onClick: replaceImage,
+                        onClick: () => toolbarActionHandle('link'),
                         className: 'mei-no-sborder'
                     },
                     el(Dashicon,
                         {
-                            onClick: replaceImage,
-                            icon: "trash" // unlink
-                        }
-                    )
-                ),
-            ),
-            el(ToolbarGroup,
-                null,
-                el("button",
-                    {
-                        onClick: replaceImage,
-                        className: 'mei-no-sborder'
-                    },
-                    el(Dashicon,
-                        {
-                            onClick: replaceImage,
                             icon: "admin-links"
                         }
                     )
                 ),
                 el("button",
                     {
-                        onClick: replaceImage,
+                        onClick: () => toolbarActionHandle('dualtone'),
                         className: 'mei-no-sborder'
                     },
                     el("svg",
@@ -165,6 +170,17 @@ export const editBlock = (props, styles) => {
                         })
                     )
                 )
+            ),
+            el(ToolbarGroup,
+                null,
+                el("button",
+                    {
+                        onClick: () => toolbarActionHandle('replaceimage'),
+                        className: ''
+                    },
+                    "Replace"
+                ),
+                isSelected && replacePopoverShow && ReplacePanel(props, dispatchModal)
             )
         )
     );
@@ -178,36 +194,33 @@ export const editBlock = (props, styles) => {
         onSelect: onSelectMedia,
         allowedTypes: ['image'],
         value: attributes.mediaID,
-        render: function (props) {
+        render: (uploadProps) => {
             return !attributes.mediaURL
-                ? el('button', {
-                    onClick: props.open
-                },
-                    'Select Image'
-                )
+                ? el('button', { onClick: uploadProps.open }, 'Select Image')
                 : el('img', {
-                        src: attributes.mediaURL,
-                        alt: 'Custom Image',
-                        class: 'mie-image__media',
-                    }
-                )
+                    src: attributes.mediaURL,
+                    alt: 'Custom Image',
+                    className: 'mie-image__media',
+                });
         }
     });
-
 
     return el('figure',
         {
             className: attributes.className,
         },
-        inspector(props, onSelect, styles), advancedInspector,
-        controls, pickMedia,
+        inspector(props, onSelect, styles), 
+        advancedInspector,
+
+        controls, 
+        
+        pickMedia,
+        
         el(RichText, {
             tagName: 'p',
             placeholder: 'Enter author...',
             value: attributes.author,
-            onChange: function (value) {
-                return setAttributes({ author: value });
-            },
+            onChange: (value) => setAttributes({ author: value }),
             className: 'custom-image-author'
         }),
     );
