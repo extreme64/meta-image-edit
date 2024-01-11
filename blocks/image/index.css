@@ -1,13 +1,5 @@
 /* Styles */
 
-.mei-no-sborder {
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
-    border-left: 0px;
-    border-right: 0px;
-}
-
-
 
 .block-editor-block-inspector .mie__row .components-base-control__field,
 .block-editor-block-inspector .mie__row--no-bottom-margin .components-base-control__field {
