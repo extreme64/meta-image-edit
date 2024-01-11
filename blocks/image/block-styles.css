@@ -28,3 +28,12 @@
     background-color: aliceblue;
     color: black;
 }
+
+/*  ***  */
+
+.mei-no-sborder {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    border-left: 0px;
+    border-right: 0px;
+}*/
