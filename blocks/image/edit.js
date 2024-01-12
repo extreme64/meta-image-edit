@@ -28,18 +28,41 @@ const modalReducer = (state, action) => {
     }
 };
 
+const initialColor = { color: "" };
+const duocolorReducer = (state, action) => {
+    console.log(action);
+    switch (action.type) {
+        case 'COLOR_NEW':
+            return { ...state, color: action.value };
+        default:
+            return state;
+    }
+};
+
+
 export const editBlock = (props, styles) => { 
     
     const { attributes, setAttributes, clientId, isSelected } = props;
     const [ selectedTab, setSelectedTab ] = useState('tab1');
     const [ replacePopoverShow, setReplacePopoverShow ] = useState(false);
-    const [state, dispatchModal ] = useReducer(modalReducer, initialState);
+    const [ state, dispatchModal ] = useReducer(modalReducer, initialState);
     const [ duotoneColor, setDuotoneColor] = useState('#222222');
+
+    const [duotoneColorePopoverShow, setDuotoneColorePopoverShow] = useState(false);
+   
+    const [ stateDuoColor, dispatchDuoColor ] = useReducer(duocolorReducer, initialColor);
+    
 
     
     useEffect(() => {
         setReplacePopoverShow(state.isModalOpen);
     }, [state])
+
+    useEffect(() => {
+        setDuotoneColor(stateDuoColor.color);
+    }, [stateDuoColor])
+
+
 
     useEffect(() => {
         if(!isSelected) {
@@ -117,8 +140,12 @@ export const editBlock = (props, styles) => {
             case 'replaceimage':
                 setReplacePopoverShow(true);
                 break;
+            case 'dualtone':
+                setDuotoneColorePopoverShow(true);
+                break;
             default:
-                setReplacePopoverShow(false);
+                setReplacePopoverShow(false); 
+                setDuotoneColorePopoverShow(false)
                 break;
         }
     };
@@ -175,7 +202,7 @@ export const editBlock = (props, styles) => {
                         })
                     )
                 ),
-                DuotonePanel(props)
+                isSelected && duotoneColorePopoverShow && el(DuotonePanel,{props})
             ),
             el(ToolbarGroup,
                 null,

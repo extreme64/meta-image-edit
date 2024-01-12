@@ -26,9 +26,6 @@ const DuotonePanel = ({ attributes, setAttributes }) => {
     const [color, setColor ] = useState('');
     const dispatch = useDispatch();
 
-    useEffect(()=>{
-        dispatch({ type: 'COLOR_CHANGE', value: color})
-    }, [color])
 
     return [
         el(Popover, {
@@ -160,6 +157,7 @@ const DuotonePanel = ({ attributes, setAttributes }) => {
                                 color: color,
                                 onChange: (newColor) => {
                                     setColor(newColor);
+                                    dispatch({ type: 'COLOR_NEW', value: newColor})
                                 },
                                 defaultValue: '#000',
                                 'data-wp-c16t': true,
