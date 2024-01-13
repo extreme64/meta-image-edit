@@ -40,6 +40,10 @@ function mie_register_block() {
                 'type' => 'string',
                 'default' => '50'
             ),
+            'mediaDuoToneColor' => array(
+                'type' => 'string',
+                'default' => ''
+            ),
             'alt' => array(
                 'type' => 'string',
                 'default' => 'illustration',

@@ -18,14 +18,30 @@ const {
     Path, 
 } = wp.components;
 const { MediaUpload } = wp.blockEditor
-const { useDispatch } = wp.data;
+const { useDispatch, useSelect } = wp.data;
+
+import { STORE_DUOTONE } from './../reducers.js';
 
 
-const DuotonePanel = ({ attributes, setAttributes }) => {
+const DuotonePanel = ({ props }) => {
 
-    const [color, setColor ] = useState('');
-    const dispatch = useDispatch();
+    const { attributes, setAttributes } = props;
+    const [ colorPickerHex, setColorPickerHex ] = useState(attributes.mediaDuoToneColor);
 
+    
+    const dispatch = useDispatch(STORE_DUOTONE);
+    
+    useEffect(() => {
+        dispatch.setDuoColor(attributes.mediaDuoToneColor);
+    }, [dispatch, attributes.mediaDuoToneColor]);
+
+    const handleColorChange = (newColor) => {
+        setColorPickerHex(newColor); 
+        dispatch.setDuoColor(newColor);
+        setAttributes({
+            mediaDuoToneColor: newColor,
+        });
+    };
 
     return [
         el(Popover, {
@@ -84,20 +100,24 @@ const DuotonePanel = ({ attributes, setAttributes }) => {
                                                 'aria-expanded': isOpen, 
                                                 'aria-haspopup': "true", 
                                                 'aria-label': "Custom color picker.", 
-                                                className: 'components-flex components-color-palette__custom-color ce-f-a-aee-dfcebbe-1ws0j2m e19lxcc00'
-                                                    // 'style': "color: rgb(0, 0, 0);"
+                                                className: 'components-flex components-color-palette__custom-color ce-f-a-aee-dfcebbe-1ws0j2m e19lxcc00',
+                                                style: { background: colorPickerHex }
                                                 },
                                                 [
                                                     el(Button, {
                                                         'data-wp-c16t': "true",
                                                         'data-wp-component': "FlexItem", 
                                                         className: "components-truncate components-flex-item components-color-palette__custom-color-name e19lxcc00 ce-f-a-aee-dfcebbe-tq6p1q e19lxcc00"
-                                                    }),
+                                                    },
+                                                    "Custom"
+                                                    ),
                                                     el(Button, {
                                                             'data-wp-c16t': "true", 
                                                             'data-wp-component': "FlexItem", 
                                                             className: "components-flex-item components-color-palette__custom-color-value ce-f-a-aee-dfcebbe-qcm38l e19lxcc00"
-                                                    })
+                                                    },
+                                                        colorPickerHex
+                                                    )
                                                 ]
                                             )
                                             
@@ -154,12 +174,8 @@ const DuotonePanel = ({ attributes, setAttributes }) => {
                         el(
                             ColorPicker,
                             {
-                                color: color,
-                                onChange: (newColor) => {
-                                    setColor(newColor);
-                                    dispatch({ type: 'COLOR_NEW', value: newColor})
-                                },
-                                defaultValue: '#000',
+                                color: colorPickerHex,
+                                onChange: (value) => handleColorChange(value),
                                 'data-wp-c16t': true,
                                 'data-wp-component': 'ColorPicker',
                                 className: 'components-color-picker fdb-a--f-ece-w3025k ez9hsf41',

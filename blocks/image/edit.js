@@ -7,37 +7,15 @@ const {
 } = wp.components;
 
 const { useEffect, useState, useReducer, createElement: el } = wp.element;
-const { dispatch, useDispatch, subscribe, select, useSelect } = wp.data;
+const { dispatch, useDispatch, subscribe, select, useSelect, useSelector } = wp.data;
 
 import { inspector, advancedInspector } from './inspector.js'
 import { hideRegisteredStylesWrap } from './../register-style-relocate/index.js';
 import { ReplacePanel } from  './toolbar/replace.js'
 import { DuotonePanel } from './toolbar/duotone.js';
 
+import { STORE_DUOTONE, modalReducer } from './reducers.js';
 
-const initialState = { isModalOpen: false };
-const modalReducer = (state, action) => {
-    switch (action.type) {
-        case 'OPEN_MODAL':
-            return { ...state, isModalOpen: true };
-        case 'CLOSE_MODAL':
-            console.log('CLOSE_MODAL');
-            return { ...state, isModalOpen: false };
-        default:
-            return state;
-    }
-};
-
-const initialColor = { color: "" };
-const duocolorReducer = (state, action) => {
-    console.log(action);
-    switch (action.type) {
-        case 'COLOR_NEW':
-            return { ...state, color: action.value };
-        default:
-            return state;
-    }
-};
 
 
 export const editBlock = (props, styles) => { 
@@ -45,23 +23,21 @@ export const editBlock = (props, styles) => {
     const { attributes, setAttributes, clientId, isSelected } = props;
     const [ selectedTab, setSelectedTab ] = useState('tab1');
     const [ replacePopoverShow, setReplacePopoverShow ] = useState(false);
-    const [ state, dispatchModal ] = useReducer(modalReducer, initialState);
-    const [ duotoneColor, setDuotoneColor] = useState('#222222');
+    const [state, dispatchModal] = useReducer(modalReducer, { isModalOpen: false });
 
     const [duotoneColorePopoverShow, setDuotoneColorePopoverShow] = useState(false);
-   
-    const [ stateDuoColor, dispatchDuoColor ] = useReducer(duocolorReducer, initialColor);
-    
 
-    
+
+    // FIXME: jsut test, remove
+    const value = useSelect((select) => select(STORE_DUOTONE).getDuoColor());
+    useEffect(() => {
+        console.log('@EDIT.JS >> Color changed:', value);
+    }, [value]); 
+
+
     useEffect(() => {
         setReplacePopoverShow(state.isModalOpen);
     }, [state])
-
-    useEffect(() => {
-        setDuotoneColor(stateDuoColor.color);
-    }, [stateDuoColor])
-
 
 
     useEffect(() => {
@@ -129,10 +105,6 @@ export const editBlock = (props, styles) => {
         }
     },
     [selectedTab]);
-
-    useEffect(() => {
-        console.log("duo", duotoneColor);
-    }, [duotoneColor])
 
 
     const toolbarActionHandle = (action) => {
@@ -202,7 +174,7 @@ export const editBlock = (props, styles) => {
                         })
                     )
                 ),
-                isSelected && duotoneColorePopoverShow && el(DuotonePanel,{props})
+                isSelected && duotoneColorePopoverShow && el(DuotonePanel,{props:props})
             ),
             el(ToolbarGroup,
                 null,
