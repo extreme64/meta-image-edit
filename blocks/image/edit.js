@@ -25,20 +25,14 @@ export const editBlock = (props, styles) => {
     const [ replacePopoverShow, setReplacePopoverShow ] = useState(false);
     const [state, dispatchModal] = useReducer(modalReducer, { isModalOpen: false });
 
-    const [duotoneColorePopoverShow, setDuotoneColorePopoverShow] = useState(false);
+    const dispatch = useDispatch(STORE_DUOTONE);
 
-
-    // FIXME: jsut test, remove
-    const value = useSelect((select) => select(STORE_DUOTONE).getDuoColor());
-    useEffect(() => {
-        console.log('@EDIT.JS >> Color changed:', value);
-    }, [value]); 
+    const isDuoColorPanelOpen = useSelect((select) => select(STORE_DUOTONE).getIsDuoColorPanel());
 
 
     useEffect(() => {
         setReplacePopoverShow(state.isModalOpen);
     }, [state])
-
 
     useEffect(() => {
         if(!isSelected) {
@@ -113,11 +107,11 @@ export const editBlock = (props, styles) => {
                 setReplacePopoverShow(true);
                 break;
             case 'dualtone':
-                setDuotoneColorePopoverShow(true);
+                dispatch.setIsDuoColorPanel(true);
                 break;
             default:
                 setReplacePopoverShow(false); 
-                setDuotoneColorePopoverShow(false)
+                dispatch.setIsDuoColorPanel(false);
                 break;
         }
     };
@@ -174,7 +168,7 @@ export const editBlock = (props, styles) => {
                         })
                     )
                 ),
-                isSelected && duotoneColorePopoverShow && el(DuotonePanel,{props:props})
+                isSelected && isDuoColorPanelOpen && el(DuotonePanel, { props: props })
             ),
             el(ToolbarGroup,
                 null,

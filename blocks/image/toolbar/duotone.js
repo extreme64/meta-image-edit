@@ -35,7 +35,7 @@ const DuotonePanel = ({ props }) => {
     const [ isColorPickerDragging, setIsShowColorPickerDragging] = useState(false);
     const [ startValue, setStartValue ] = useState('#333333');
 
-    const [editingCurrentColor, setEditingCurrentColor] = useState(null);
+    const [ editingCurrentColor, setEditingCurrentColor] = useState(null);
 
     const dispatch = useDispatch(STORE_DUOTONE);
     
@@ -76,8 +76,8 @@ const DuotonePanel = ({ props }) => {
     }
     
     const debouncedHandleColorChange = useCallback(
+        
         debounce((newColor, editingCurrentColor) => {
-
             if (editingCurrentColor){
                 if (editingCurrentColor === 'shadows' ) {
                     setAttributes({
@@ -94,33 +94,15 @@ const DuotonePanel = ({ props }) => {
             if (!isColorPickerDragging){
                 // setShowColorPicker(false);
             }
-        
+
         }, 300), 
         [isColorPickerDragging]
     );
 
 
     const handleColorChange = (newColor) => {
-       
-        debouncedHandleColorChange(newColor, editingCurrentColor);
         dispatch.setDuoColor(newColor);
-        
-        // // if (editingCurrentColor){
-        //     if (editingCurrentColor === 'shadows' ) {
-        //         setAttributes({
-        //             mediaDuoToneColorShadows: newColor,
-        //         });
-        //         setColorPickerShadowsHex(newColor); 
-        //     } else if (editingCurrentColor === 'highlights') {
-        //         setAttributes({
-        //             mediaDuoToneColorHighlights: newColor,
-        //         });
-        //         setColorPickerHighlightsHex(newColor)
-        //     }
-        // // }
-        // if (!isColorPickerDragging){
-        //     // setShowColorPicker(false);
-        // }
+        debouncedHandleColorChange(newColor, editingCurrentColor);
     };
 
     const updateColorpickerStartColor = (pickingString) => {
@@ -129,6 +111,17 @@ const DuotonePanel = ({ props }) => {
         } else if (pickingString === 'highlights') {
             setStartValue(colorPickerHighlightsHex);
         }
+    }
+
+    const unsetColors = () => {
+        setColorPickerShadowsHex('')
+        setColorPickerHighlightsHex('')
+    }
+
+    const clearColors = () => {
+        unsetColors();
+        setShowColorPicker(false);
+        dispatch.setIsDuoColorPanel(false);
     }
 
     return [
@@ -145,26 +138,36 @@ const DuotonePanel = ({ props }) => {
 
                             el('div', { className: 'components-circular-option-picker__swatches' }, [
                                 el('div', { className: 'components-duotone-picker__color-indicator components-circular-option-picker__option-wrapper' }, [
-                                    el(Button, { type: 'button', 'aria-pressed': 'false', value: 'unset', className: 'components-button components-circular-option-picker__option' }),
+                                    el(
+                                        Button, { 
+                                            onClick: () => unsetColors(),
+                                            type: 'button', 'aria-pressed': 'false', value: 'unset', className: 'components-button components-circular-option-picker__option' }
+                                        ),
                                 ]),
                             ]),
 
                             el(Spacer, { 'data-wp-c16t': 'true', 'data-wp-component': 'Spacer', className: 'components-spacer dd-f-a-a-de-y2b16m e19lxcc00' }),
                             el(VStack, { 'data-wp-c16t': 'true', 'data-wp-component': 'VStack', className: 'components-flex components-h-stack components-v-stack dd-f-a-a-de-1xpbaan e19lxcc00' }, [
                             
-                            
+                                // Gradient bar 
                                 el('div', {
                                     className: 'components-custom-gradient-picker__gradient-bar has-gradient', 
                                     style: { 
                                         background: 'linear-gradient(90deg,  ' + colorPickerShadowsHex + ' 0%, ' + colorPickerShadowsHex + ' 50%, ' + colorPickerHighlightsHex + ' 50%, ' + colorPickerHighlightsHex + ' 100%)' 
                                         } 
                                     }, [
+
+                                    // Circle btns
                                     el('div', { className: 'components-custom-gradient-picker__markers-container' }, [
-                                        el('div', { className: 'components-dropdown components-custom-gradient-picker__control-point-dropdown', tabIndex: '-1', style: { left: '0%', transform: 'translateX(-50%)' } }, [
+                                        el('div', { 
+                                            onClick: () => handleColorPickerPanel('open', 'shadows'),
+                                            className: 'components-dropdown components-custom-gradient-picker__control-point-dropdown', tabIndex: '-1', style: { left: '0%', transform: 'translateX(-50%)' } }, [
                                             el(Button, { type: 'button', 'aria-label': 'Gradient control point at position 0% with color code #333.', 'aria-describedby': 'components-custom-gradient-picker__control-point-button-description-0', 'aria-haspopup': 'true', 'aria-expanded': 'false', className: 'components-button components-custom-gradient-picker__control-point-button' }),
                                             el(VisuallyHidden, { 'data-wp-c16t': 'true', 'data-wp-component': 'VisuallyHidden', id: 'components-custom-gradient-picker__control-point-button-description-0', className: 'components-visually-hidden dd-f-a-a-de-0 e19lxcc00', style: { border: '0px', clip: 'rect(1px, 1px, 1px, 1px)', clipPath: 'inset(50%)', height: '1px', margin: '-1px', overflow: 'hidden', padding: '0px', position: 'absolute', width: '1px', overflowWrap: 'normal' } }, 'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'),
                                         ]),
-                                        el('div', { className: 'components-dropdown components-custom-gradient-picker__control-point-dropdown', tabIndex: '-1', style: { left: '100%', transform: 'translateX(-50%)' } }, [
+                                        el('div', { 
+                                            onClick: () => handleColorPickerPanel('open', 'highlights'),
+                                            className: 'components-dropdown components-custom-gradient-picker__control-point-dropdown', tabIndex: '-1', style: { left: '100%', transform: 'translateX(-50%)' } }, [
                                             el(Button, { type: 'button', 'aria-label': 'Gradient control point at position 100% with color code #CCC.', 'aria-describedby': 'components-custom-gradient-picker__control-point-button-description-1', 'aria-haspopup': 'true', 'aria-expanded': 'false', className: 'components-button components-custom-gradient-picker__control-point-button' }),
                                             el(VisuallyHidden, { 'data-wp-c16t': 'true', 'data-wp-component': 'VisuallyHidden', id: 'components-custom-gradient-picker__control-point-button-description-1', className: 'components-visually-hidden dd-f-a-a-de-0 e19lxcc00', style: { border: '0px', clip: 'rect(1px, 1px, 1px, 1px)', clipPath: 'inset(50%)', height: '1px', margin: '-1px', overflow: 'hidden', padding: '0px', position: 'absolute', width: '1px', overflowWrap: 'normal' } }, 'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'),
                                         ]),
@@ -288,7 +291,11 @@ const DuotonePanel = ({ props }) => {
                             ]),
 
                             el('div', { className: 'components-circular-option-picker__custom-clear-wrapper' }, [
-                                el(Button, { type: 'button', className: 'components-button components-circular-option-picker__clear is-tertiary' }, 'Clear'),
+                                el(Button, { 
+                                    onClick: () => clearColors(),
+                                    type: 'button', className: 'components-button components-circular-option-picker__clear is-tertiary' }, 
+                                    'Clear'
+                                ),
                             ]),       
                         ]),
                     ]),
@@ -312,7 +319,6 @@ const DuotonePanel = ({ props }) => {
                         ColorPicker,
                         {
                             color: startValue,
-                            // onChange: (value) => handleColorChange(value), 
                             onChangeComplete: (val) => setStartValue(val),
                             'data-wp-c16t': true,
                             'data-wp-component': 'ColorPicker',

@@ -41,6 +41,12 @@ const modalReducer = (state = modalInitialState, action) => {
 export const STORE_DUOTONE = 'mie-image/duotone';
 
 const actionsDuotone = {
+    setIsDuoColorPanel(status) {
+        return {
+            type: 'mie-image/duocolor-panel',
+            payload: { value: status },
+        };
+    },
     setDuoColor(color) {
         return {
             type: 'mie-image/duocolor-new',
@@ -50,6 +56,9 @@ const actionsDuotone = {
 }
 
 const selectorsDuotone = {
+    getIsDuoColorPanel(state) {
+        return state.isDuoColorPanel;
+    },
     getDuoColor(state) {
         return state.duoColor;
     },
@@ -57,14 +66,17 @@ const selectorsDuotone = {
 
 const duocolorReducer = (state = duocolorInitialState, action) => {
     switch (action.type) {
+        case 'mie-image/duocolor-panel':
+            return { ...state, isDuoColorPanel: action.payload.value };
         case 'mie-image/duocolor-new':
             return { ...state, duoColor: action.payload.value };
-            default:
-                return state;
-            }
-        };
+        default:
+            return state;
+        }
+    };
         
 const duocolorInitialState = {
+    isDuoColorPanel: false,
     duoColor: '',
 };
 
