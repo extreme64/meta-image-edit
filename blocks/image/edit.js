@@ -13,6 +13,7 @@ import { inspector, advancedInspector } from './inspector.js'
 import { hideRegisteredStylesWrap } from './../register-style-relocate/index.js';
 import { ReplacePanel } from  './toolbar/replace.js'
 import { DuotonePanel } from './toolbar/duotone.js';
+import { InserLinkPanel } from './toolbar/insert-link.js';
 
 import { STORE_DUOTONE, modalReducer } from './reducers.js';
 
@@ -23,12 +24,12 @@ export const editBlock = (props, styles) => {
     const { attributes, setAttributes, clientId, isSelected } = props;
     const [ selectedTab, setSelectedTab ] = useState('tab1');
     const [ replacePopoverShow, setReplacePopoverShow ] = useState(false);
-    const [state, dispatchModal] = useReducer(modalReducer, { isModalOpen: false });
+    const [ state, dispatchModal] = useReducer(modalReducer, { isModalOpen: false });
 
     const dispatch = useDispatch(STORE_DUOTONE);
 
     const isDuoColorPanelOpen = useSelect((select) => select(STORE_DUOTONE).getIsDuoColorPanel());
-
+    const [ isInserLinkPanelOpen, setIsInserLinkPanelOpen ] = useState(true);
 
     useEffect(() => {
         setReplacePopoverShow(state.isModalOpen);
@@ -149,6 +150,7 @@ export const editBlock = (props, styles) => {
                         }
                     )
                 ),
+                isSelected && isInserLinkPanelOpen && el(InserLinkPanel, { props: props }),
                 el("button",
                     {
                         onClick: () => toolbarActionHandle('dualtone'),
