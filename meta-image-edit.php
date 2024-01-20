@@ -48,6 +48,10 @@ function mie_register_block() {
                 'type' => 'string',
                 'default' => '#333333'
             ),
+            'mediaInsertLink' => array(
+                'type' => 'object',
+                'default' => json_encode(['url' => 'https//...', 'target' => true, 'linkRel' => "noref"])
+            ),
             'alt' => array(
                 'type' => 'string',
                 'default' => 'illustration',
@@ -158,6 +162,12 @@ function mie_render_block($attributes) {
     if(is_array($attributes['mediaDimensions'])){
         $imgStyle = 'width: ' . $attributes['mediaDimensions']['width'] . 'px; height: ' . $attributes['mediaDimensions']['height'] . 'px';
     }
+
+    $mediaInsertLink = $attributes['mediaInsertLink'];
+    if(is_array($attributes['mediaInsertLink'])){
+    //    TODO: conver inser link attrs.
+    }
+
 
     if (!empty($mediaID)) {
         $attachment = get_post($mediaID);
