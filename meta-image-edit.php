@@ -52,7 +52,6 @@ function mie_register_block() {
                 'type' => 'object',
                 'default' => [ 'url' => 'https//...', 'target' => true, 'linkRel' => "noref" ],
             ),
-
             'alt' => array(
                 'type' => 'string',
                 'default' => 'illustration',
@@ -151,6 +150,7 @@ function mie_render_block($attributes) {
     $caption = '';
     $description = '';
     $altText = '';
+    $mediaInsertLinkObj = '';
 
     $mie_media_serialized_data = get_post_meta($mediaID, 'mie_media_data', true);
     $mie_media_data = unserialize( $mie_media_serialized_data );
@@ -166,7 +166,7 @@ function mie_render_block($attributes) {
 
     $mediaInsertLink = $attributes['mediaInsertLink'];
     if(is_array($attributes['mediaInsertLink'])){
-    //    TODO: conver inser link attrs.
+        $mediaInsertLinkObj = $attributes['mediaInsertLink'];
     }
 
 
@@ -187,11 +187,13 @@ function mie_render_block($attributes) {
         style="font-size: 13px; width: <?= $attributes["mediaFlexWidth"] ?>%">
         
         <?php if (!empty($mediaID)) : ?>
-            <img 
-                src="<?php echo wp_get_attachment_image_src($mediaID, 'full')[0]; ?>" 
-                alt="<?php echo $altText ?>" 
-                title="<?php echo $caption ?>"
-                style="<?= $imgStyle ?>" >
+            <a href="<?= $mediaInsertLinkObj['url'] ?>" rel="<?= $mediaInsertLinkObj['linkRel'] ?>" target="<?= ($mediaInsertLinkObj['target']) ? '_blank' : '' ?>">
+                <img 
+                    src="<?php echo wp_get_attachment_image_src($mediaID, 'full')[0]; ?>" 
+                    alt="<?php echo $altText ?>" 
+                    title="<?php echo $caption ?>"
+                    style="<?= $imgStyle ?>" >
+            </a>
         <?php endif; ?>    
         <p style="padding: 0; margin: 8px 0"><?php echo esc_html($description); ?></p>
         <p style="padding: 0; margin: 8px 0">
