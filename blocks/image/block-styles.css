@@ -49,6 +49,15 @@
 }
 
 
+.insert-link-popover__link {
+    padding: 0 10px;
+    width: max-content;
+    display: flex;
+    align-items: center;
+    max-width: 200px;
+}
+
+
 /*  */
 
 input:invalid {

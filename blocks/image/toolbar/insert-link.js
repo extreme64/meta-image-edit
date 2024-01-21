@@ -149,12 +149,11 @@ const InserLinkPanel = ({ props }) => {
         },
         el(
             'div', {
-                    className: "block-editor-url-popover__row"
+                    className: "insert-link-popover block-editor-url-popover__row"
                 },
                 el(
                     'form', { 
-                            // onSubmit: onSubmit,
-                            id: "insertLinkForm-22",
+                            onSubmit: onSubmit,
                             className: "block-editor-url-popover__link-editor"
                         },
                         !isLinkApplied && [
@@ -170,7 +169,8 @@ const InserLinkPanel = ({ props }) => {
                                     type: 'url',
                                     required: true,
                                     'aria-required': "true",
-                                    ref: inputUrlRef
+                                    ref: inputUrlRef,
+                                    className: "insert-link-popover__url-input"
                                 }
                             ),
                             el(
@@ -191,7 +191,8 @@ const InserLinkPanel = ({ props }) => {
                         onClick: (event) => { console.log(event); },
                         href: insertLink.url,
                         'aria-role': "link",
-                        target: insertLink.target
+                        target: insertLink.target,
+                        className: "insert-link-popover__link"
                     },
                     insertLink.url
                 ),
