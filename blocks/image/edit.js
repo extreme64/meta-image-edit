@@ -29,7 +29,7 @@ export const editBlock = (props, styles) => {
     const dispatch = useDispatch(STORE_DUOTONE);
 
     const isDuoColorPanelOpen = useSelect((select) => select(STORE_DUOTONE).getIsDuoColorPanel());
-    const [ isInserLinkPanelOpen, setIsInserLinkPanelOpen ] = useState(true);
+    const [ isInserLinkPanelOpen, setIsInserLinkPanelOpen ] = useState(false);
 
     useEffect(() => {
         setReplacePopoverShow(state.isModalOpen);
@@ -104,6 +104,9 @@ export const editBlock = (props, styles) => {
 
     const toolbarActionHandle = (action) => {
         switch (action) {
+            case 'insertlink':
+                setIsInserLinkPanelOpen(true);
+                break;
             case 'replaceimage':
                 setReplacePopoverShow(true);
                 break;
@@ -111,6 +114,7 @@ export const editBlock = (props, styles) => {
                 dispatch.setIsDuoColorPanel(true);
                 break;
             default:
+                setIsInserLinkPanelOpen(false);
                 setReplacePopoverShow(false); 
                 dispatch.setIsDuoColorPanel(false);
                 break;
@@ -141,7 +145,7 @@ export const editBlock = (props, styles) => {
                 null,
                 el("button",
                     {
-                        onClick: () => toolbarActionHandle('link'),
+                        onClick: () => toolbarActionHandle('insertlink'),
                         className: 'mei-no-sborder'
                     },
                     el(Dashicon,

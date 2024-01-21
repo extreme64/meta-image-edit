@@ -49,15 +49,24 @@ const InserLinkPanel = ({ props }) => {
     const inputUrlRef = useRef(null);
     
 
-
     const dispatch = useDispatch(STORE_DUOTONE);
 
-
     useEffect(() => {
+        if(insertLink.url)
+            setIsLinkApplied(true)
+
+        console.log(attributes);
+            // testObj
+    }, []);
+
+
+    const handleInsertLinkChanges = () => {
         setAttributes({
             mediaInsertLink: insertLink
-        })
-    }, [insertLink]);
+        });
+    }
+
+    useEffect(() => {  handleInsertLinkChanges }, [insertLink]);
 
     const toggleIsOpen = () => {
         setIsOpen(!isOpen);
@@ -68,19 +77,16 @@ const InserLinkPanel = ({ props }) => {
         //TODO: handle appling link to url or post
     }
 
-    const handleUrlChange = (newUrlValue) => {
-        setInsertLink({ ...insertLink, url: newUrlValue });
-    };
-
     const handleToggleChange = () => {
         setInsertLink({ ...insertLink, target: !insertLink.target });
     };
 
     const handleRelLinkChange = (newRelLinkValue) => {
+        console.log(newRelLinkValue);
         setInsertLink({ ...insertLink, linkRel: newRelLinkValue });
     };
 
-    const removeLink = (newRelLinkValue) => { 
+    const removeLink = () => { 
         setInsertLink({ url: "", target: false, linkRel: "" });
         setIsLinkApplied(false);
     }
@@ -98,15 +104,24 @@ const InserLinkPanel = ({ props }) => {
     };
 
     const onSubmit = (event) => {
+        let isAllValid
 
         const urlInput = inputUrlRef.current;
         const validationMessage = validateUrlInput(insertLink.url);
-
         urlInput.setCustomValidity(validationMessage);
-        urlInput.reportValidity();
+        isAllValid = urlInput.reportValidity();
 
-        setIsOpen(false);
+        if (isAllValid) {
+            event.preventDefault();
+            handleInsertLinkChanges(insertLink.url)
+            setIsLinkApplied(true);
+            setIsOpen(false);
+        }
     };
+
+    // "mediaInsertLink": '{ "url": "https://example-2nice.gg", "target": true, "linkRel": "noopener" }'
+    //                     ['url' => 'https//...', 'target' => true, 'linkRel' => "noref"]
+
 
     return el(
         URLPopover, {
