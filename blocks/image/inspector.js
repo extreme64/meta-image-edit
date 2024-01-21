@@ -208,8 +208,8 @@ const inspector = (props, onSelect, styles ) => {
                             onChange: (newWidthNumber) => {
                                 setAttributes({
                                     mediaDimensions: {
+                                        ...mediaDimensions,
                                         width: newWidthNumber,
-                                        height: attributes.mediaDimensions.height
                                     }
                                 })
 
@@ -228,7 +228,7 @@ const inspector = (props, onSelect, styles ) => {
                             onChange: (newHeightNumber) => {
                                 setAttributes({
                                     mediaDimensions: {
-                                        width: attributes.mediaDimensions.width,
+                                        ...mediaDimensions,
                                         height: newHeightNumber
                                     }
                                 })
