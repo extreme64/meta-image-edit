@@ -15,7 +15,7 @@ const {
     Icon: IconComp 
 } = wp.components;
 
-const { createElement: el, useMemo, useState } = wp.element;
+const { createElement: el, useMemo, useState, useEffect } = wp.element;
 const { useSelect } = wp.data
 
 
@@ -82,7 +82,8 @@ const inspector = (props, onSelect, styles ) => {
 
     const { attributes, setAttributes, clientId } = props;
 
-    const [mediaWrapWidth, setMediaWrapWidth] = useState(attributes.mediaFlexWidth); // Example initial value
+    const [mediaWrapWidth, setMediaWrapWidth] = useState(attributes.mediaFlexWidth);
+    const [mediaDimensions, setMediaDimensions] = useState(attributes.mediaDimensions);
 
 
     function MediaSizeSelect({ value }) {
@@ -143,6 +144,17 @@ const inspector = (props, onSelect, styles ) => {
         blockWrap.style.width = `${value}%`;
     };
 
+    useEffect(() => {
+        setAttributes({
+            mediaDimensions: mediaDimensions
+        })
+
+        let media = document.querySelector('[data-type="mie/image"] .mie-image__media');
+        media.style.width = `${mediaDimensions.width}px`;
+        media.style.height = `${mediaDimensions.height}px`;
+
+    }, [mediaDimensions]);
+
 
     return el(InspectorControls,
         {},
@@ -198,47 +210,26 @@ const inspector = (props, onSelect, styles ) => {
                     className: "mie__row--no-bottom-margin"
                 },
                     el(BaseControl, {
-                        className: "mie__row mie__image-dimensions"
-                    },
+                            className: "mie__row mie__image-dimensions"
+                        },
                         el(NumberControl, {
                             name: "width",
                             className: "mie__image-dimensions__width",
                             label: 'Width',
-                            value: attributes.mediaDimensions.width,
-                            onChange: (newWidthNumber) => {
-                                setAttributes({
-                                    mediaDimensions: {
-                                        ...mediaDimensions,
-                                        width: newWidthNumber,
-                                    }
-                                })
-
-                                let media = document.querySelector('[data-type="mie/image"] .mie-image__media');
-                                media.style.width = `${attributes.mediaDimensions.width}px`;
-                                media.style.height = `${attributes.mediaDimensions.height}px`;
+                            value: mediaDimensions.width,
+                            onChange: (newWidthNumber) => { 
+                                setMediaDimensions({ ...mediaDimensions, width: newWidthNumber });
                             }
-                        }
-                        ),
-
+                        }),
                         el(NumberControl, {
                             name: "height",
                             className: "mie__image-dimensions__height",
                             label: 'Height',
-                            value: attributes.mediaDimensions.height,
+                            value: mediaDimensions.height,
                             onChange: (newHeightNumber) => {
-                                setAttributes({
-                                    mediaDimensions: {
-                                        ...mediaDimensions,
-                                        height: newHeightNumber
-                                    }
-                                })
-
-                                let media = document.querySelector('[data-type="mie/image"] .mie-image__media');
-                                media.style.width = `${attributes.mediaDimensions.width}px`;
-                                media.style.height = `${attributes.mediaDimensions.height}px`;
+                                setMediaDimensions({ ...mediaDimensions, height: newHeightNumber});
                             }
-                        }
-                        )
+                        })
                     )
                 ),
                 // Rendered component
