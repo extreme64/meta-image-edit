@@ -34,7 +34,7 @@ function mie_register_block() {
             ),
             'mediaDimensions' => array(
                 'type' => 'object',
-                'default' => json_encode(['width' => '300px', 'height' => '200px'])
+                'default' => ['width' => '300px', 'height' => '200px'],
             ),
             'mediaFlexWidth' => array(
                 'type' => 'string',
@@ -50,8 +50,9 @@ function mie_register_block() {
             ),
             'mediaInsertLink' => array(
                 'type' => 'object',
-                'default' => json_encode(['url' => 'https//...', 'target' => true, 'linkRel' => "noref"])
+                'default' => [ 'url' => 'https//...', 'target' => true, 'linkRel' => "noref" ],
             ),
+
             'alt' => array(
                 'type' => 'string',
                 'default' => 'illustration',
