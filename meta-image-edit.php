@@ -161,7 +161,9 @@ function mie_render_block($attributes) {
     $source = isset( $mie_media_data['mie_source'] ) ? $mie_media_data['mie_source'] : '';
     $mediaDimensions = $attributes['mediaDimensions'];
     if(is_array($attributes['mediaDimensions'])){
-        $imgStyle = 'width: ' . $attributes['mediaDimensions']['width'] . 'px; height: ' . $attributes['mediaDimensions']['height'] . 'px';
+        $width = ($attributes['mediaDimensions']['width'] !== '') ? 'width: ' .$attributes['mediaDimensions']['width'] . 'px; ' : '';
+        $height = ($attributes['mediaDimensions']['height']) ? 'height: ' .$attributes['mediaDimensions']['height'] . 'px; ' : '';
+        $imgStyle = $width . $height;
     }
 
     $mediaInsertLink = $attributes['mediaInsertLink'];
@@ -182,11 +184,18 @@ function mie_render_block($attributes) {
     ob_start();
     ?>
     
+    <style>
+        .mie-image-block {
+            --base: <?= $attributes['mediaDuoToneColorShadows']; ?>;
+            --foreground: <?= $attributes['mediaDuoToneColorHighlights']; ?>;
+        }
+    </style>
 
     <div class="mie-image-block <?php echo $attributes['className'] ?>" <?php echo get_block_wrapper_attributes(); ?> 
         style="font-size: 13px; width: <?= $attributes["mediaFlexWidth"] ?>%">
         
         <?php if (!empty($mediaID)) : ?>
+        <div class="mie-image-block__wrap img-wrapper">
             <a href="<?= $mediaInsertLinkObj['url'] ?>" rel="<?= $mediaInsertLinkObj['linkRel'] ?>" target="<?= ($mediaInsertLinkObj['target']) ? '_blank' : '' ?>">
                 <img 
                     src="<?php echo wp_get_attachment_image_src($mediaID, 'full')[0]; ?>" 
@@ -194,6 +203,7 @@ function mie_render_block($attributes) {
                     title="<?php echo $caption ?>"
                     style="<?= $imgStyle ?>" >
             </a>
+        </div>
         <?php endif; ?>    
         <p style="padding: 0; margin: 8px 0"><?php echo esc_html($description); ?></p>
         <p style="padding: 0; margin: 8px 0">
