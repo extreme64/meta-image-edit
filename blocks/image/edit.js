@@ -44,6 +44,8 @@ export const editBlock = (props, styles) => {
     useEffect(() => {
         let blockWrap = document.querySelector('[data-type="mie/image"]');
         blockWrap.style.width = `${attributes.mediaFlexWidth}%`;
+        blockWrap.style.setProperty('--base', attributes.mediaDuoToneColorShadows);
+        blockWrap.style.setProperty('--foreground', attributes.mediaDuoToneColorHighlights);
 
         let media = blockWrap.querySelector('.mie-image__media');
         media.style.width = `${attributes.mediaDimensions.width}px`;
@@ -204,7 +206,7 @@ export const editBlock = (props, styles) => {
                 ? el('button', { onClick: uploadProps.open }, 'Select Image')
                 : el('img', {
                     src: attributes.mediaURL,
-                    alt: 'Custom Image',
+                    alt: attributes.alt,
                     className: 'mie-image__media',
                 });
         }
