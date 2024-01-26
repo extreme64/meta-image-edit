@@ -14,7 +14,7 @@ function mie_register_block() {
 
     register_block_type('mie/image', array(
         'editor_script' => 'mie-block-editor-script',
-        'editor_style'  => 'mie-block-editor-style', 
+        'editor_style'  => 'mie-block-editor-styles', 
         'script'        => 'mie-block-script',
         'style'         => 'mie-block-styles',
 
@@ -101,13 +101,15 @@ add_action('init', 'mie_register_block');
 
 function enqueue_block_styles() {
     // Enqueue block styles for the editor
-    wp_enqueue_style(
-        'mie-block-editor-style',
-        plugin_dir_url( __FILE__ ) . 'blocks/image/block-styles.css', // Path to your block styles file
-        array(),
-        '1.0',
-        'all'
-    );
+    if (is_admin()) {
+        wp_enqueue_style(
+            'mie-block-editor-styles',
+            plugin_dir_url( __FILE__ ) . 'blocks/image/block-editor-styles.css', // Path to your block styles file
+            array(),
+            '1.0',
+            'all'
+        );
+    }
     // Enqueue block styles for the frontend
     wp_enqueue_style(
         'mie-block-styles',
