@@ -1,1 +1,12 @@
 /* Block Editor Styles */
+
+[data-type="mie/image"] .mie-image__license-link {
+    z-index: 1000;
+    position: relative;
+    text-decoration:underline
+}
+[data-type="mie/image"] .mie-image__license-link:hover,
+[data-type="mie/image"] .mie-image__license-link:focus {
+    text-decoration: none;
+    cursor: pointer;
+}

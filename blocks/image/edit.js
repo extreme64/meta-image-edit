@@ -14,6 +14,7 @@ import { hideRegisteredStylesWrap } from './../register-style-relocate/index.js'
 import { ReplacePanel } from  './toolbar/replace.js'
 import { DuotonePanel } from './toolbar/duotone.js';
 import { InserLinkPanel } from './toolbar/insert-link.js';
+import { stripHtmlTags, htmlEntities } from './../misc.js';
 
 import { STORE_DUOTONE, modalReducer } from './reducers.js';
 
@@ -25,6 +26,13 @@ export const editBlock = (props, styles) => {
     const [ selectedTab, setSelectedTab ] = useState('tab1');
     const [ replacePopoverShow, setReplacePopoverShow ] = useState(false);
     const [ state, dispatchModal] = useReducer(modalReducer, { isModalOpen: false });
+
+
+    const [ author, setAuthor ] = useState('');
+    const [ license, setLicense ] = useState('');
+    const [ licensePost, setLicensePost ] = useState({});
+    const [ source, setSource ] = useState('');
+
 
     const dispatch = useDispatch(STORE_DUOTONE);
 
@@ -52,6 +60,37 @@ export const editBlock = (props, styles) => {
         media.style.height = `${attributes.mediaDimensions.height}px`;
     }, [])
 
+
+    useEffect(() => {
+        if (license) {
+
+            wp.apiFetch({ path: `/wp/v2/license/${license}` })
+                .then((post) => {
+                    if (post) {
+                        const { title, excerpt, link, status, featured_media } = post;
+
+                        const licencePostObj = {
+                            'title': htmlEntities.decode(title?.rendered),
+                            'excerpt': stripHtmlTags(htmlEntities.decode(excerpt?.rendered)),
+                            'link': link,
+                            'status': status,
+                            'featured_media': featured_media
+                        };
+                        setLicensePost(licencePostObj);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching post data:', error);
+                });
+        }
+    }, [license]);
+    
+    useEffect(() => {
+        let blockWrap = document.querySelector('[data-type="mie/image"]');
+        blockWrap.style.setProperty('--base', attributes.mediaDuoToneColorShadows);
+        blockWrap.style.setProperty('--foreground', attributes.mediaDuoToneColorHighlights);
+    }, [attributes.mediaDuoToneColorShadows, attributes.mediaDuoToneColorHighlights])
+
     useEffect(() => {
 
         if (attributes.mediaID) {
@@ -69,18 +108,17 @@ export const editBlock = (props, styles) => {
                     // Extracting the author value
                     const authorRegex = /"mie_author";s:(\d+):"([^"]+)";/;
                     const authorMatch = serializedData.match(authorRegex);
-                    const author = authorMatch ? authorMatch[2] : '';
+                    setAuthor(authorMatch ? authorMatch[2] : '');
 
                     // Extracting the license value
                     const licenseRegex = /"mie_license";s:(\d+):"([^"]+)";/;
                     const licenseMatch = serializedData.match(licenseRegex);
-                    const license = licenseMatch ? licenseMatch[2] : '';
+                    setLicense(licenseMatch ? licenseMatch[2] : '');
 
                     // Extracting the source value
                     const sourceRegex = /"mie_source";s:(\d+):"([^"]+)";/;
                     const sourceMatch = serializedData.match(sourceRegex);
-                    const source = sourceMatch ? sourceMatch[2] : '';
-
+                    setSource(sourceMatch ? sourceMatch[2] : '');
                 })
                 .catch((error) => {
                     // Handle error if necessary
@@ -102,7 +140,7 @@ export const editBlock = (props, styles) => {
         }
     },
     [selectedTab]);
-
+   
 
     const toolbarActionHandle = (action) => {
         switch (action) {
@@ -191,6 +229,22 @@ export const editBlock = (props, styles) => {
             )
         )
     );
+    
+    const imageAndMeta = el(
+        'div', {
+            className: "mie-image__meta-wrap",
+        },
+        `Author: ${author} | License: `,
+            el(
+                'a', {
+                    href: licensePost?.link,
+                    className: "mie-image__license-link",
+                    title: licensePost?.excerpt
+                },
+                licensePost?.title
+            ),
+        `, Source: ${ source }`
+    );
 
     /**
      * Select media or upload file for blocks's image
@@ -204,31 +258,24 @@ export const editBlock = (props, styles) => {
         render: (uploadProps) => {
             return !attributes.mediaURL
                 ? el('button', { onClick: uploadProps.open }, 'Select Image')
-                : el('img', {
-                    src: attributes.mediaURL,
-                    alt: attributes.alt,
-                    className: 'mie-image__media',
-                });
+                : [
+                    el('img', {
+                        src: attributes.mediaURL,
+                        alt: attributes.alt,
+                        className: 'mie-image__media ' + attributes.className,
+                    }),
+                    imageAndMeta
+                ];
         }
     });
 
+
+
     return el('figure',
-        {
-            className: attributes.className,
-        },
+        null,
         inspector(props, onSelect, styles), 
         advancedInspector,
-
         controls, 
-        
-        pickMedia,
-        
-        el(RichText, {
-            tagName: 'p',
-            placeholder: 'Enter author...',
-            value: attributes.author,
-            onChange: (value) => setAttributes({ author: value }),
-            className: 'custom-image-author'
-        }),
+        pickMedia
     );
 }
