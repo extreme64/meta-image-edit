@@ -146,7 +146,6 @@ add_filter('script_loader_tag', 'add_module_attribute', 10, 3);
 // Callback function to render the block on the frontend
 function mie_render_block($attributes) {
     
-    
     $mediaID = isset($attributes['mediaID']) ? $attributes['mediaID'] : '';
 
     $caption = '';
@@ -193,7 +192,7 @@ function mie_render_block($attributes) {
         }
     </style>
 
-    <div class="mie-image-block <?php echo $attributes['className'] ?>" <?php echo get_block_wrapper_attributes(); ?> 
+    <div class="mie-image-block " <?php echo get_block_wrapper_attributes(); ?> 
         style="font-size: 13px; width: <?= $attributes["mediaFlexWidth"] ?>%">
         
         <?php if (!empty($mediaID)) : ?>
@@ -203,7 +202,8 @@ function mie_render_block($attributes) {
                     src="<?php echo wp_get_attachment_image_src($mediaID, 'full')[0]; ?>" 
                     alt="<?php echo $altText ?>" 
                     title="<?php echo $caption ?>"
-                    style="<?= $imgStyle ?>" >
+                    style="<?= $imgStyle ?>" 
+                    class="<?= $attributes['className'] ?>" >
             </a>
         </div>
         <?php endif; ?>    
@@ -226,8 +226,6 @@ function mie_render_block($attributes) {
 
     return $html;
 }    
-
-
 
 /**
  * Render callback for the custom Gutenberg block
